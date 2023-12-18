@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gráfico de Precipitação e ET</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <script>
+        // Dados de exemplo para precipitação e ET (substitua pelos seus próprios dados)
+        var jsonData = {{ filteredData | safe }};
+
+        // Extrair os rótulos, EXC e ET dos dados
+        var meses = jsonData.map(function(entry) {
+            return entry.DT_MEDICAO;
+        });
+
+        var exc_mes = jsonData.map(function(entry) {
+            return entry.EXC;
+        });
+
+        var def_mes = jsonData.map(function(entry) {
+            return entry.DEF;
+        });
+
+        // Configuração do gráfico
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: meses,
+                datasets: [
+                    {
+                        label: 'Excedente',
+                        data: exc_mes,
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                        fill: 'origin'
+                    },
+                    {
+                        label: 'Deficit',
+                        data: def_mes,
+                        backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                        fill: 'origin'
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Extrato do Balanço Hídrico'
+                },
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Meses'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'mm'
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            min: Math.min(...def_mes, ...exc_mes),
+                            max: Math.max(...def_mes, ...exc_mes)
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+
